@@ -56,6 +56,7 @@ schema_view = get_schema_view(
 
 urlpatterns = (
         [
+            path("", include('school.urls')),
             re_path(
                 r"^swagger(?P<format>\.json|\.yaml)$",
                 schema_view.without_ui(cache_timeout=0),
