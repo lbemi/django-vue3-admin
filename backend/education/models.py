@@ -1,4 +1,5 @@
 from django.db import models
+
 from application import settings
 
 
@@ -19,9 +20,6 @@ class Question(models.Model):
                                            verbose_name="修改时间")
     create_datetime = models.DateTimeField(auto_now_add=True, null=True, blank=True, help_text="创建时间",
                                            verbose_name="创建时间")
-
-    def __str__(self):
-        return self.title
 
     class Meta:
         db_table = 'question'

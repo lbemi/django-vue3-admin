@@ -61,7 +61,7 @@ INSTALLED_APPS = [
     "captcha",
     "channels",
     "dvadmin.system",
-    "ai_education",
+    "education",
     "school",
 ]
 
