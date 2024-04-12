@@ -1,5 +1,3 @@
-from django.shortcuts import render
-
 from dvadmin.utils.serializers import CustomModelSerializer
 from dvadmin.utils.viewset import CustomModelViewSet
 from school.models import School, Professional
@@ -19,7 +17,12 @@ class SchoolModelSerializer(CustomModelSerializer):
 
 class SchoolViewSet(CustomModelViewSet):
     """
-    查询学校
+    学校管理接口
+    list:查询
+    create:新增
+    update:修改
+    retrieve:单例
+    destroy:删除
     """
     queryset = School.objects.all()
     serializer_class = SchoolModelSerializer
@@ -39,7 +42,12 @@ class ProfessionalModelSerializer(CustomModelSerializer):
 
 class ProfessionalViewSet(CustomModelViewSet):
     """
-    查询专业
+    专业管理接口
+    list:查询
+    create:新增
+    update:修改
+    retrieve:单例
+    destroy:删除
     """
     queryset = Professional.objects.all()
     serializer_class = ProfessionalModelSerializer

@@ -10,11 +10,12 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
-from conf.env import *
 import os
 import sys
-from pathlib import Path
 from datetime import timedelta
+from pathlib import Path
+
+from conf.env import *
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -45,7 +46,7 @@ ALLOWED_HOSTS = locals().get("ALLOWED_HOSTS", ["*"])
 
 # 列权限需要排除的App应用
 COLUMN_EXCLUDE_APPS = ['channels', 'captcha'] + \
-    locals().get("COLUMN_EXCLUDE_APPS", [])
+                      locals().get("COLUMN_EXCLUDE_APPS", [])
 
 INSTALLED_APPS = [
     "django.contrib.auth",

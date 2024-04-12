@@ -6,14 +6,13 @@
 @Created on: 2021/6/3 003 0:30
 @Remark: 菜单按钮管理
 """
-from django.db.models import F, Subquery, OuterRef, Exists
+from django.db.models import F, OuterRef, Exists
 from rest_framework import serializers
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 
 from dvadmin.system.models import RoleMenuButtonPermission, Menu, MenuButton, Dept, RoleMenuPermission, FieldPermission, \
     MenuField
-from dvadmin.system.views.menu import MenuSerializer
 from dvadmin.utils.json_response import DetailResponse, ErrorResponse
 from dvadmin.utils.serializers import CustomModelSerializer
 from dvadmin.utils.viewset import CustomModelViewSet
@@ -23,11 +22,11 @@ class RoleMenuButtonPermissionSerializer(CustomModelSerializer):
     """
     菜单按钮-序列化器
     """
+
     class Meta:
         model = RoleMenuButtonPermission
         fields = "__all__"
         read_only_fields = ["id"]
-
 
 
 class RoleMenuButtonPermissionCreateUpdateSerializer(CustomModelSerializer):
@@ -67,16 +66,16 @@ class RoleButtonPermissionSerializer(CustomModelSerializer):
             return None
         return obj.data_range
 
-
     class Meta:
         model = MenuButton
-        fields = ['id','name','value','isCheck','data_range']
+        fields = ['id', 'name', 'value', 'isCheck', 'data_range']
+
 
 class RoleFieldPermissionSerializer(CustomModelSerializer):
-
     class Meta:
         model = FieldPermission
         fields = "__all__"
+
 
 class RoleMenuFieldSerializer(CustomModelSerializer):
     is_query = serializers.SerializerMethodField()
@@ -103,9 +102,10 @@ class RoleMenuFieldSerializer(CustomModelSerializer):
         if queryset:
             return queryset.is_update
         return False
+
     class Meta:
         model = MenuField
-        fields = ['id','field_name','title','is_query','is_create','is_update']
+        fields = ['id', 'field_name', 'title', 'is_query', 'is_create', 'is_update']
 
 
 class RoleMenuPermissionSerializer(CustomModelSerializer):
@@ -121,6 +121,7 @@ class RoleMenuPermissionSerializer(CustomModelSerializer):
         parent_list = Menu.get_all_parent(instance['id'])
         names = [d["name"] for d in parent_list]
         return "/".join(names)
+
     def get_isCheck(self, instance):
         params = self.request.query_params
         return RoleMenuPermission.objects.filter(
@@ -130,19 +131,18 @@ class RoleMenuPermissionSerializer(CustomModelSerializer):
 
     def get_btns(self, instance):
         btn_list = MenuButton.objects.filter(menu__id=instance['id']).values('id', 'name', 'value')
-        serializer = RoleButtonPermissionSerializer(btn_list,many=True,request=self.request)
-        return  serializer.data
+        serializer = RoleButtonPermissionSerializer(btn_list, many=True, request=self.request)
+        return serializer.data
 
     def get_columns(self, instance):
         col_list = MenuField.objects.filter(menu=instance['id'])
-        serializer = RoleMenuFieldSerializer(col_list,many=True,request=self.request)
+        serializer = RoleMenuFieldSerializer(col_list, many=True, request=self.request)
         return serializer.data
-
-
 
     class Meta:
         model = Menu
-        fields = ['id','name','isCheck','btns','columns']
+        fields = ['id', 'name', 'isCheck', 'btns', 'columns']
+
 
 class RoleMenuButtonPermissionViewSet(CustomModelViewSet):
     """
@@ -160,15 +160,15 @@ class RoleMenuButtonPermissionViewSet(CustomModelViewSet):
     extra_filter_class = []
 
     @action(methods=['GET'], detail=False, permission_classes=[IsAuthenticated])
-    def get_role_premission(self, request):
+    def get_role_permission(self, request):
         """
         角色授权获取:
         :param request: role
         :return: menu,btns,columns
         """
         params = request.query_params
-        role = params.get('role',None)
-        if  role is None:
+        role = params.get('role', None)
+        if role is None:
             return ErrorResponse(msg="未获取到角色信息")
         is_superuser = request.user.is_superuser
         # if is_superuser:
@@ -182,11 +182,11 @@ class RoleMenuButtonPermissionViewSet(CustomModelViewSet):
         # return DetailResponse(data=data)
         data = []
         if is_superuser:
-            queryset = Menu.objects.filter(status=1,is_catalog=False).values('name', 'id').all()
+            queryset = Menu.objects.filter(status=1, is_catalog=False).values('name', 'id').all()
         else:
             role_id = request.user.role.values_list('id', flat=True)
-            menu_list = RoleMenuPermission.objects.filter(role__in=role_id).values_list('id',flat=True)
-            queryset = Menu.objects.filter(status=1, is_catalog=False,id__in=menu_list).values('name', 'id')
+            menu_list = RoleMenuPermission.objects.filter(role__in=role_id).values_list('id', flat=True)
+            queryset = Menu.objects.filter(status=1, is_catalog=False, id__in=menu_list).values('name', 'id')
         for item in queryset:
             parent_list = Menu.get_all_parent(item['id'])
             names = [d["name"] for d in parent_list]
@@ -214,7 +214,7 @@ class RoleMenuButtonPermissionViewSet(CustomModelViewSet):
         return DetailResponse(data=data)
 
     @action(methods=['PUT'], detail=True, permission_classes=[IsAuthenticated])
-    def set_role_premission(self,request,pk):
+    def set_role_premission(self, request, pk):
         """
         对角色的菜单和按钮及按钮范围授权:
         :param request:
@@ -234,14 +234,15 @@ class RoleMenuButtonPermissionViewSet(CustomModelViewSet):
                 # RoleMenuPermission.objects.create(role_id=pk, menu_id=menu.get('id'))
             for btn in menu.get('btns'):
                 if btn.get('isCheck'):
-                    data_range = btn.get('data_range',0) or 0
-                    instance = RoleMenuButtonPermission.objects.create(role_id=pk, menu_button_id=btn.get('id'),data_range=data_range)
-                    instance.dept.set(btn.get('dept',[]))
+                    data_range = btn.get('data_range', 0) or 0
+                    instance = RoleMenuButtonPermission.objects.create(role_id=pk, menu_button_id=btn.get('id'),
+                                                                       data_range=data_range)
+                    instance.dept.set(btn.get('dept', []))
             for col in menu.get('columns'):
-                FieldPermission.objects.update_or_create(role_id=pk,field_id=col.get('id'),is_query=col.get('is_query'),is_create=col.get('is_create'),is_update=col.get('is_update'))
+                FieldPermission.objects.update_or_create(role_id=pk, field_id=col.get('id'),
+                                                         is_query=col.get('is_query'), is_create=col.get('is_create'),
+                                                         is_update=col.get('is_update'))
         return DetailResponse(msg="授权成功")
-
-
 
     @action(methods=['GET'], detail=False, permission_classes=[IsAuthenticated])
     def role_menu_get_button(self, request):

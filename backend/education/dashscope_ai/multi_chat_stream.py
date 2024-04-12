@@ -1,42 +1,65 @@
+import uuid
 from http import HTTPStatus
 
+import dashscope
 from dashscope import Generation
 
+from conf.env import DASHSCOPE_KEY
 
-def multi_round():
-    messages = [{'role': 'system', 'content': 'You are a helpful assistant.'},
-                {'role': 'user', 'content': '如何做西红柿炖牛腩？'}]
-    response = Generation.call("qwen-turbo",
-                               messages=messages,
-                               # 将输出设置为"message"格式
-                               result_format='message')
-    if response.status_code == HTTPStatus.OK:
-        print(response)
-        # 将assistant的回复添加到messages列表中
-        messages.append({'role': response.output.choices[0]['message']['role'],
-                         'content': response.output.choices[0]['message']['content']})
-    else:
-        print('Request id: %s, Status code: %s, error code: %s, error message: %s' % (
-            response.request_id, response.status_code,
-            response.code, response.message
-        ))
-        # 如果响应失败，将最后一条user message从messages列表里删除，确保user/assistant消息交替出现
-        messages = messages[:-1]
-    # 将新一轮的user问题添加到messages列表中
-    messages.append({'role': 'user', 'content': '不放糖可以吗？'})
-    # 进行第二轮模型的响应
-    response = Generation.call("qwen-turbo",
-                               messages=messages,
-                               result_format='message',  # 将输出设置为"message"格式
-                               )
-    if response.status_code == HTTPStatus.OK:
-        print(response)
-    else:
-        print('Request id: %s, Status code: %s, error code: %s, error message: %s' % (
-            response.request_id, response.status_code,
-            response.code, response.message
-        ))
+dashscope.api_key = DASHSCOPE_KEY
 
 
-if __name__ == '__main__':
-    multi_round()
+class DialogueManager:
+    def __init__(self, user_id):
+        self.history = []
+        self.uuid = uuid.uuid4()
+        self.user_id = user_id
+
+    def get_history(self):
+        return self.history
+
+    def add_history(self, message: list):
+        # 两个数组拼接
+        self.history.extend(message)
+
+    def chat(self, message: str):
+        messages = [{'role': 'user', 'content': message}]
+        self.add_history(messages)
+        try:
+            response = Generation.call("qwen-turbo",
+                                       messages=self.history,
+                                       result_format='message',
+                                       stream=True,
+                                       incremental_output=True)
+            collected_content = ''
+            last_role = ''
+            for res in response:
+                if res.status_code == HTTPStatus.OK and res.output and res.output.choices:
+                    choice = res.output.choices[0]
+                    if 'message' in choice and 'content' in choice['message']:
+                        content = choice['message']['content']
+                        role = choice['message'].get('role', '')
+                        print(content, end='')
+                        collected_content += content
+                        last_role = role
+                        yield content
+                    else:
+                        print("Unexpected response format.")
+                else:
+                    print('Request failed with id: %s, Status code: %s, error code: %s, error message: %s' % (
+                        res.request_id if hasattr(res, 'request_id') else '',
+                        res.status_code if hasattr(res, 'status_code') else '',
+                        res.code if hasattr(res, 'code') else '',
+                        res.message if hasattr(res, 'message') else ''
+                    ))
+            self.add_history([{'role': last_role, 'content': collected_content}])
+            print("结束。。。。。", self.uuid, self.history)
+        except Exception as e:
+            print(f"An unexpected error occurred: {e}")
+
+# if __name__ == '__main__':
+#     dialogue_manager = DialogueManager(1)
+#     messages = [{'role': 'system', 'content': 'You are a helpful assistant.'},
+#                 {'role': 'user', 'content': '如何做西红柿炖牛腩？'}]
+#     dialogue_manager.chat(messages)
+#     dialogue_manager.chat([{'role': 'user', 'content': '夏天可以吃什么？'}])

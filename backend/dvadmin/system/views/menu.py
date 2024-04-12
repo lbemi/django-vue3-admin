@@ -24,7 +24,8 @@ class MenuSerializer(CustomModelSerializer):
     hasChild = serializers.SerializerMethodField()
 
     def get_menuPermission(self, instance):
-        queryset = instance.menuPermission.order_by('-name').values('id', 'name', 'value')
+        queryset = instance.menuPermission.order_by(
+            '-name').values('id', 'name', 'value')
         # MenuButtonSerializer(instance.menuPermission.all(), many=True)
         if queryset:
             return queryset
@@ -50,7 +51,8 @@ class MenuCreateSerializer(CustomModelSerializer):
     name = serializers.CharField(required=False)
 
     def create(self, validated_data):
-        menu_obj = Menu.objects.filter(parent_id=validated_data.get('parent', None)).order_by('-sort').first()
+        menu_obj = Menu.objects.filter(parent_id=validated_data.get(
+            'parent', None)).order_by('-sort').first()
         last_sort = menu_obj.sort if menu_obj else 0
         validated_data['sort'] = last_sort + 1
         return super().create(validated_data)
@@ -71,8 +73,8 @@ class WebRouterSerializer(CustomModelSerializer):
     class Meta:
         model = Menu
         fields = (
-            'id', 'parent', 'icon', 'sort', 'path', 'name', 'title', 'is_link','link_url', 'is_catalog', 'web_path', 'component',
-            'component_name', 'cache', 'visible','is_iframe','is_affix', 'status')
+            'id', 'parent', 'icon', 'sort', 'path', 'name', 'title', 'is_link', 'link_url', 'is_catalog', 'web_path', 'component',
+            'component_name', 'cache', 'visible', 'is_iframe', 'is_affix', 'status')
         read_only_fields = ["id"]
 
 
@@ -90,7 +92,8 @@ class MenuViewSet(CustomModelViewSet):
     create_serializer_class = MenuCreateSerializer
     update_serializer_class = MenuCreateSerializer
     search_fields = ['name', 'status']
-    filter_fields = ['parent', 'name', 'status', 'is_link', 'visible', 'cache', 'is_catalog']
+    filter_fields = ['parent', 'name', 'status',
+                     'is_link', 'visible', 'cache', 'is_catalog']
 
     def list(self, request):
         """懒加载"""
@@ -123,7 +126,8 @@ class MenuViewSet(CustomModelViewSet):
             queryset = self.queryset.filter(status=1)
         else:
             role_list = user.role.values_list('id', flat=True)
-            menu_list = RoleMenuPermission.objects.filter(role__in=role_list).values_list('menu_id', flat=True)
+            menu_list = RoleMenuPermission.objects.filter(
+                role__in=role_list).values_list('menu_id', flat=True)
             queryset = Menu.objects.filter(id__in=menu_list)
         serializer = WebRouterSerializer(queryset, many=True, request=request)
         data = serializer.data
@@ -136,7 +140,8 @@ class MenuViewSet(CustomModelViewSet):
         queryset = self.queryset.all()
         if not user.is_superuser:
             role_list = user.role.values_list('id', flat=True)
-            menu_list = RoleMenuPermission.objects.filter(role__in=role_list).values_list('menu_id')
+            menu_list = RoleMenuPermission.objects.filter(
+                role__in=role_list).values_list('menu_id')
             queryset = Menu.objects.filter(id__in=menu_list)
         serializer = WebRouterSerializer(queryset, many=True, request=request)
         data = serializer.data
@@ -150,7 +155,8 @@ class MenuViewSet(CustomModelViewSet):
             menu = Menu.objects.get(id=menu_id)
         except Menu.DoesNotExist:
             return ErrorResponse(msg="菜单不存在")
-        previous_menu = Menu.objects.filter(sort__lt=menu.sort, parent=menu.parent).order_by('-sort').first()
+        previous_menu = Menu.objects.filter(
+            sort__lt=menu.sort, parent=menu.parent).order_by('-sort').first()
         if previous_menu:
             previous_menu.sort, menu.sort = menu.sort, previous_menu.sort
             previous_menu.save()
@@ -165,7 +171,8 @@ class MenuViewSet(CustomModelViewSet):
             menu = Menu.objects.get(id=menu_id)
         except Menu.DoesNotExist:
             return ErrorResponse(msg="菜单不存在")
-        next_menu = Menu.objects.filter(sort__gt=menu.sort, parent=menu.parent).order_by('sort').first()
+        next_menu = Menu.objects.filter(
+            sort__gt=menu.sort, parent=menu.parent).order_by('sort').first()
         if next_menu:
             next_menu.sort, menu.sort = menu.sort, next_menu.sort
             next_menu.save()
