@@ -1,19 +1,20 @@
-import uuid
 from http import HTTPStatus
 
 import dashscope
 from dashscope import Generation
 
 from conf.env import DASHSCOPE_KEY
+from education.dashscope_ai.embedding import generate_embeddings
+from qdrant.qdrant import QdrantService
 
 dashscope.api_key = DASHSCOPE_KEY
 
 
 class DialogueManager:
-    def __init__(self, user_id):
+    def __init__(self, username, uuid):
         self.history = []
-        self.uuid = uuid.uuid4()
-        self.user_id = user_id
+        self.uuid = uuid
+        self.user_id = username
 
     def get_history(self):
         return self.history
@@ -21,6 +22,10 @@ class DialogueManager:
     def add_history(self, message: list):
         # 两个数组拼接
         self.history.extend(message)
+
+    def set_assistant(self, message: str):
+        messages = [{'role': 'assistant', 'content': message}]
+        self.add_history(messages)
 
     def chat(self, message: str):
         messages = [{'role': 'user', 'content': message}]
@@ -57,9 +62,11 @@ class DialogueManager:
         except Exception as e:
             print(f"An unexpected error occurred: {e}")
 
-# if __name__ == '__main__':
-#     dialogue_manager = DialogueManager(1)
-#     messages = [{'role': 'system', 'content': 'You are a helpful assistant.'},
-#                 {'role': 'user', 'content': '如何做西红柿炖牛腩？'}]
-#     dialogue_manager.chat(messages)
-#     dialogue_manager.chat([{'role': 'user', 'content': '夏天可以吃什么？'}])
+
+def search_similar_questions(query: str):
+    vec = generate_embeddings(query)
+    # 搜索相似问题
+    points = QdrantService().search(vec, limit=5, with_payload=True)
+    for point in points:
+        if point.score() > 0.8:
+            print("", point.payload(), point.score())

@@ -7,7 +7,6 @@ from education.views.chat import ChatViewSet
 
 urlpatterns = [
     path("chat", ChatViewSet.as_view()),
-
 ]
 
 # urlpatterns += router.urls

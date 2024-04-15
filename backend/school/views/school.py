@@ -51,6 +51,6 @@ class ProfessionalViewSet(CustomModelViewSet):
     """
     queryset = Professional.objects.all()
     serializer_class = ProfessionalModelSerializer
-    search_fields = ['special_name']
+    search_fields = ['profession_name']
     filter_fields = ['school_id']
     pagination_class = None

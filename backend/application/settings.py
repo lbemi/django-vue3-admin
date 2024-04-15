@@ -46,7 +46,7 @@ ALLOWED_HOSTS = locals().get("ALLOWED_HOSTS", ["*"])
 
 # 列权限需要排除的App应用
 COLUMN_EXCLUDE_APPS = ['channels', 'captcha'] + \
-                      locals().get("COLUMN_EXCLUDE_APPS", [])
+    locals().get("COLUMN_EXCLUDE_APPS", [])
 
 INSTALLED_APPS = [
     "django.contrib.auth",
@@ -64,6 +64,7 @@ INSTALLED_APPS = [
     "dvadmin.system",
     "education",
     "school",
+    "qdrant.apps.QdrantConfig"
 ]
 
 MIDDLEWARE = [
@@ -194,7 +195,16 @@ CHANNEL_LAYERS = {
 #         },
 #     },
 # }
-
+# ================================================= #
+# ******************** qdrant配置 ****************** #
+# ================================================= #
+QDRANT = {
+    "HOST": QDRANT_HOST,
+    "PORT": QDRANT_PORT,
+    "COLLECTION_NAME": QDRANT_DB,
+    "KEY": QDRANT_KEY,
+    "PREFER_GRPC": PREFER_GRPC,
+}
 
 # ================================================= #
 # ********************* 日志配置 ******************* #
