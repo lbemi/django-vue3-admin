@@ -24,12 +24,13 @@ class DialogueManager:
         self.history.extend(message)
 
     def set_assistant(self, message: str):
-        messages = [{'role': 'assistant', 'content': message}]
+        messages = [{'role': 'system', 'content': message}]
         self.add_history(messages)
 
     def chat(self, message: str):
         messages = [{'role': 'user', 'content': message}]
         self.add_history(messages)
+        print("开始。。。。。数据：  ", self.uuid, self.history)
         try:
             response = Generation.call("qwen-turbo",
                                        messages=self.history,
@@ -63,10 +64,15 @@ class DialogueManager:
             print(f"An unexpected error occurred: {e}")
 
 
-def search_similar_questions(query: str):
+def search_similar_questions(query: str, score: float = 0.8):
+    result = []
     vec = generate_embeddings(query)
+    if 0 == len(vec):
+        return result
     # 搜索相似问题
     points = QdrantService().search(vec, limit=5, with_payload=True)
     for point in points:
-        if point.score() > 0.8:
-            print("", point.payload(), point.score())
+        if point.score > score:
+            result.append(point)
+
+    return result

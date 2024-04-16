@@ -1,12 +1,13 @@
 import hashlib
 
 from django.contrib.auth.hashers import make_password, check_password
+from django.db import connection
+from django.db.models import Q
 from django_restql.fields import DynamicSerializerMethodField
 from rest_framework import serializers
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
-from django.db import connection
-from django.db.models import Q
+
 from application import dispatch
 from dvadmin.system.models import Users, Role, Dept
 from dvadmin.system.views.role import RoleSerializer
@@ -328,7 +329,8 @@ class UserViewSet(CustomModelViewSet):
             return ErrorResponse(msg="两次密码不匹配")
         verify_password = check_password(old_pwd, self.request.user.password)
         if not verify_password:
-            verify_password = check_password(hashlib.md5(old_pwd.encode(encoding='UTF-8')).hexdigest(), self.request.user.password)
+            verify_password = check_password(hashlib.md5(old_pwd.encode(encoding='UTF-8')).hexdigest(),
+                                             self.request.user.password)
         if verify_password:
             request.user.password = make_password(hashlib.md5(new_pwd.encode(encoding='UTF-8')).hexdigest())
             request.user.save()
@@ -377,6 +379,7 @@ class UserViewSet(CustomModelViewSet):
             show_all = 0
         if int(show_all):
             all_did = [dept_id]
+
             def inner(did):
                 sub = Dept.objects.filter(parent_id=did)
                 if not sub.exists():
@@ -384,12 +387,13 @@ class UserViewSet(CustomModelViewSet):
                 for i in sub:
                     all_did.append(i.pk)
                     inner(i)
+
             if dept_id != '':
                 inner(dept_id)
                 searchs = [
-                    Q(**{f+'__icontains':i})
+                    Q(**{f + '__icontains': i})
                     for f in self.search_fields
-                ] if (i:=request.query_params.get('search')) else []
+                ] if (i := request.query_params.get('search')) else []
                 q_obj = []
                 if searchs:
                     q = searchs[0]

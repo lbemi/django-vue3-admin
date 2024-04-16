@@ -56,9 +56,3 @@ class QdrantService:
                                    limit=limit,
                                    with_payload=with_payload,
                                    )
-
-#
-# if __name__ == '__main__':
-#     qdrant = QdrantService()
-#     res = qdrant.list_collection()
-#     print(res)

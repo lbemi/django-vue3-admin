@@ -1,4 +1,6 @@
+import { getBaseURL } from '/@/utils/baseUrl';
 import { request } from '/@/utils/service';
+import { Session } from '/@/utils/storage';
 
 interface schoolQuery {
 	name?: string;
@@ -49,10 +51,21 @@ interface ChatData {
  * @param data 聊天数据
  * @returns 返回一个请求对象
  */
-export function AiChat(data: ChatData) {
-	return request({
-		url: 'api/ai/chat',
-		method: 'post',
-		data: data,
-	});
+
+export async function AiChat(data: ChatData) {
+	try {
+		const url = getBaseURL() + 'api/ai/chat';
+		const token = Session.get('token');
+		const result = await fetch(url, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				Authorization: `JWT ${token}`,
+			},
+			body: JSON.stringify(data),
+		});
+		return result;
+	} catch (error) {
+		return error;
+	}
 }

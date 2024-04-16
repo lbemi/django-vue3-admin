@@ -125,6 +125,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { useChatStore } from '/@/stores/chat';
 import { ChatMessage } from '/@/types/chat';
 import { Promotion } from '@element-plus/icons-vue';
+import { time } from 'console';
 
 const historyStore = useChatStore();
 
@@ -270,6 +271,8 @@ const readStream = async (reader: ReadableStreamDefaultReader<Uint8Array>, statu
 			break;
 		}
 		const decodedText = decoder.decode(value, { stream: true });
+		console.log('-----result:::', decodedText);
+
 		if (status !== 200) {
 			const code = JSON.parse(decodedText);
 			state.history[state.history.length - 1].content += code.message;
@@ -288,6 +291,7 @@ const readStream = async (reader: ReadableStreamDefaultReader<Uint8Array>, statu
 			}
 			break;
 		}
+
 		appendLastMessageContent(decodedText);
 	}
 };
