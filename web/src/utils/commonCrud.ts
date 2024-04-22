@@ -36,7 +36,7 @@ export const commonCrudConfig = (options = {
 }) => {
     return {
         dept_belong_id: {
-            title: '所属部门',
+            title: '所属学校',
             type: 'dict-tree',
             search: {
                 show: options.dept_belong_id?.search || false
@@ -72,7 +72,7 @@ export const commonCrudConfig = (options = {
                         }
                     }
                 },
-                helper: "默认不填则为当前创建用户的部门ID"
+                helper: "默认不填则为当前创建用户的学校ID"
             }
         },
         description: {

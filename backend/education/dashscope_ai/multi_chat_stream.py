@@ -5,16 +5,17 @@ from dashscope import Generation
 
 from conf.env import DASHSCOPE_KEY
 from education.dashscope_ai.embedding import generate_embeddings
+from education.models import Question
 from qdrant.qdrant import QdrantService
 
 dashscope.api_key = DASHSCOPE_KEY
 
 
 class DialogueManager:
-    def __init__(self, username, uuid):
+    def __init__(self, user_id, uuid):
         self.history = []
         self.uuid = uuid
-        self.user_id = username
+        self.user_id = user_id
 
     def get_history(self):
         return self.history
@@ -59,9 +60,16 @@ class DialogueManager:
                         res.message if hasattr(res, 'message') else ''
                     ))
             self.add_history([{'role': last_role, 'content': collected_content}])
-            print("结束。。。。。", self.uuid, self.history)
+            # 入库
+            self.insert_question(message, collected_content)
         except Exception as e:
             print(f"An unexpected error occurred: {e}")
+
+    def insert_question(self, question: str, answer: str):
+        print("数据入库。。。。")
+        Question.objects.create(question_uuid=self.uuid, question=question, creator_id=self.user_id,
+                                answer=answer,
+                                )
 
 
 def search_similar_questions(query: str, score: float = 0.8):

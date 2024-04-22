@@ -199,7 +199,7 @@ export const createCrudOptions = function ({crudExpose}: CreateCrudOptionsProps)
                     },
                 },
                 dept: {
-                    title: '部门',
+                    title: '学校',
                     search: {
                         disabled: true,
                     },

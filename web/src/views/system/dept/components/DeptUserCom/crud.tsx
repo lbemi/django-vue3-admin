@@ -211,7 +211,7 @@ export const createCrudOptions = function ({ crudExpose, context }: CreateCrudOp
 					},
 				},
 				dept: {
-					title: '部门',
+					title: '学校',
 					type: 'dict-tree',
 					dict: dict({
 						isTree: true,

@@ -40,11 +40,11 @@ class ChatViewSet(APIView):
         uuid = request.data.get('uuid')
 
         print(
-            f'----{request.user.username}-{uuid}- professional_id: {professional_id}- school_id:{school_id} - message: {message}')
+            f'----{request.user.username} --- {request.user.id} -{uuid}- professional_id: {professional_id}- school_id:{school_id} - message: {message}')
 
         if not all([validate_input(value) for value in [school_id, professional_id]]):
             return StreamingHttpResponse("请求参数错误")
-        chat_manager = DialogueManager(request.user.username, uuid)
+        chat_manager = DialogueManager(request.user.id, uuid)
         if not message:
             res = generate_message(school_id, professional_id)
             if not res:

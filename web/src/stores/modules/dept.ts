@@ -11,7 +11,7 @@ export const useDeptInfoStore = defineStore('deptInfo', {
     ),
     actions:{
       async requestDeptInfo() {
-            // 请求部门信息
+            // 请求学校信息
             const ret = await request({
                 url: '/api/system/dept/all_dept/'
             })

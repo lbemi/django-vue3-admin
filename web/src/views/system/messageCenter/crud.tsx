@@ -141,7 +141,7 @@ export const createCrudOptions = function ({
 							{ value: 1, label: '按角色' },
 							{
 								value: 2,
-								label: '按部门',
+								label: '按学校',
 							},
 							{ value: 3, label: '通知公告' },
 						],
@@ -274,7 +274,7 @@ export const createCrudOptions = function ({
 					},
 				},
 				target_dept: {
-					title: '目标部门',
+					title: '目标学校',
 					search: {
 						disabled: true,
 					},
@@ -296,7 +296,7 @@ export const createCrudOptions = function ({
 								columns: [
 									{
 										prop: 'name',
-										label: '部门名称',
+										label: '学校名称',
                                         width: 150,
 									},
 									{
@@ -305,7 +305,7 @@ export const createCrudOptions = function ({
 									},
 									{
 										prop: 'parent_name',
-										label: '父级部门',
+										label: '父级学校',
 									},
 								],
 							},

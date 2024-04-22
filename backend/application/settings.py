@@ -46,7 +46,7 @@ ALLOWED_HOSTS = locals().get("ALLOWED_HOSTS", ["*"])
 
 # 列权限需要排除的App应用
 COLUMN_EXCLUDE_APPS = ['channels', 'captcha'] + \
-    locals().get("COLUMN_EXCLUDE_APPS", [])
+                      locals().get("COLUMN_EXCLUDE_APPS", [])
 
 INSTALLED_APPS = [
     "django.contrib.auth",
@@ -191,7 +191,7 @@ CHANNEL_LAYERS = {
 #     'default': {
 #         'BACKEND': 'channels_redis.core.RedisChannelLayer',
 #         'CONFIG': {
-#             "hosts": [('127.0.0.1', 6379)], #需修改
+#             "hosts": [('127.0.0.1', 6379)],  # 需修改
 #         },
 #     },
 # }

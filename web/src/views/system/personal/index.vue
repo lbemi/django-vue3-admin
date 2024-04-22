@@ -20,7 +20,7 @@
 											<div class="personal-item-value">{{ state.personalForm.name }}</div>
 										</el-col>
 										<el-col :xs="24" :sm="16" class="personal-item mb6">
-											<div class="personal-item-label">部门：</div>
+											<div class="personal-item-label">学校：</div>
 											<div class="personal-item-value">
 												<el-tag>{{ state.personalForm.dept_info.dept_name }}</el-tag>
 											</div>

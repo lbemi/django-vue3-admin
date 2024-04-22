@@ -3,15 +3,15 @@
 		<div class="di-left">
 			<h3>{{ deptInfo.dept_name || '' }}</h3>
 			<div class="di-cell">
-				<p>部门负责人：</p>
+				<p>学校负责人：</p>
 				<p class="content">{{ deptInfo.owner || '无' }}</p>
 			</div>
 			<div class="di-cell">
-				<p>部门人数：</p>
+				<p>学校人数：</p>
 				<p class="content">{{ deptInfo.dept_user || 0 }}人</p>
 			</div>
 			<div class="di-cell">
-				<p>部门简介：</p>
+				<p>学校简介：</p>
 				<p class="content">{{ deptInfo.description || '无' }}</p>
 			</div>
 			<div class="di-cell">
@@ -95,7 +95,7 @@ let resetPwdFormState = reactive({
 });
 
 /**
- * 初始化顶部部门折线图
+ * 初始化顶部学校折线图
  */
 const initDeptCountBarChart = () => {
 	const xAxisData = deptInfo.value.sub_dept_map?.map((item) => item.name) || [];
@@ -187,7 +187,7 @@ const initDeptSexPieChart = () => {
 };
 
 /**
- * 获取顶部部门信息
+ * 获取顶部学校信息
  */
 const getDeptInfo = async () => {
 	const res = await getDeptInfoById(currentDeptId.value, isShowChildFlag.value ? '1' : '0');
@@ -199,7 +199,7 @@ const getDeptInfo = async () => {
 };
 
 /**
- * 部门切换刷新用户列表
+ * 学校切换刷新用户列表
  */
 const handleDoRefreshUser = (id: string) => {
 	currentDeptId.value = id;

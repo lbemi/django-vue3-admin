@@ -14,7 +14,7 @@ export default {
         systemMenu: '菜单管理',
         systemRole: '角色管理',
         systemUser: '用户管理',
-        systemDept: '部门管理',
+        systemDept: '学校管理',
         /* 日志管理 */
         loginLog: '登录日志',
         operationLog: '操作日志',

@@ -1,7 +1,5 @@
 from django.db import models
 
-from application import settings
-
 
 # Create your models here.
 
@@ -9,9 +7,8 @@ from application import settings
 class Question(models.Model):
     id = models.BigAutoField(
         primary_key=True, help_text="Id", verbose_name="Id")
-    creator = models.ForeignKey(to=settings.AUTH_USER_MODEL, related_query_name='creator_query', null=True,
-                                verbose_name='创建人', help_text="创建人", on_delete=models.SET_NULL,
-                                db_constraint=False)
+    creator_id = models.BigIntegerField(
+        null=False, blank=True, help_text="创建人id", verbose_name="创建人id")
     question_uuid = models.CharField(
         max_length=255, unique=True, help_text="问题唯一标识", verbose_name="问题唯一标识")
     question = models.TextField(help_text="问题", verbose_name="问题")
